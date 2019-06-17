@@ -21,8 +21,8 @@ These scripts are relevant for only the training part. There are other scripts (
 * track phi
 
 #### Training outputs
-Parameters of the mixture model. In this case the mean and std of the Gaussian kernels.
-* Estimated position = Gaussian $`\mu`$
-* Estimated uncertainty = Gaussian $`\sigma`$
+Parameters of the mixture model. In this case the _mean_($`\mu`$) and _precision_ ($`\beta`$) of the Gaussian kernels. Precision is defined as the inverse of variance.
+* Estimated position = $`\mu`$
+* Estimated uncertainty = $`\frac{1}{\sqrt{\beta}}`$
 
 
