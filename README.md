@@ -3,8 +3,6 @@
 ----
 
 ### MDN training code
-{: .gitlab-orange}
-
 These scripts are relevant for only the training part. There are other scripts (not included here) for producing the training inputs.
 
 #### software environment
@@ -24,7 +22,7 @@ These scripts are relevant for only the training part. There are other scripts (
 
 #### Training outputs
 Parameters of the mixture model. In this case the mean and std of the Gaussian kernels.
-* Estimated position = Gaussian $\mu$
-* Estimated uncertainty = Gaussian $\sigma$
+* Estimated position = Gaussian $`\mu`$
+* Estimated uncertainty = Gaussian $`\sigma`$
 
 
