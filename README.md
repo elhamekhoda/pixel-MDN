@@ -4,6 +4,24 @@
 
 ### MDN training code
 These scripts are relevant for only the training part. There are other scripts (not included here) for producing the training inputs.
+* `train-MDN.py` is the main trainign script. It can be used for all three networks. The inputs should be in h5 format
+* `genconfig.py` creates the network configuration
+* `evalMDN.py` evalues the trained networks on the test set. Srote outputs in a AQL database
+* `gensql_posErr.py` cretes the SQL query to read the data base
+* `residual.cxx` used while reading the SQL data base to ceate histograms
+* `test-driver` executable. Runs SQL query and residual script
+* `root2json_MDNvars.py` used to convert the MDN variables (from a root file) into json format for `lwtnn`
+
+Example:
+```
+python
+python train-MDN.py --training_input PATH-TO-INPUT-FILE(.h5) --training_output OUTPUT-PATH --outFile OUTPUT-SUFFIX --network_type NETWORK-TYPE (1particle, 2particle, 3particle) --config <(python $PWD/genconfig.py --type TYPE (pos1,po2,po3))
+```
+`--type`: takes values `pos1` for 1 particle network, `pos2` for 2 particle network and `pos3` for 3 particle network
+
+`--network_type`: possible values = 1particle, 2particle, 3particle)
+
+`train-MDN_2p.py` is an example code for 2-particle training
 
 #### software environment
 * Python 3.5.1

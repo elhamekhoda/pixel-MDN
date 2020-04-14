@@ -22,36 +22,33 @@ np.random.seed(12122)
 
 
 def train_nn(training_input,
-            training_output,
-            validation_fraction,
-            outFile,
-            network_type,
-            config,
-            structure=[100, 80, 50],
-            #activation='sigmoid',
-            #output_activation='softmax',
-            regularizer=0.0001,
-            learning_rate=0.0001,
-            #momentum=0.4,
-            #batch=60,
-            #min_epochs=10,
-            #max_epochs=230,
-            ###patience_increase=1.75,
-            ###threshold=0.995,
-            #min_delta=0.001,
-            patience=5,
-            #profile=False,
-            #nbworkers=6,
-            #save_all=False,
-            verbose=True): \
+             validation_fraction,
+             output,
+             config,
+             structure=[100, 80, 50],
+             #activation='sigmoid',
+             #output_activation='softmax',
+             regularizer=0.0001,
+             learning_rate=0.0001,
+             #momentum=0.4,
+             #batch=60,
+             #min_epochs=10,
+             #max_epochs=230,
+             ###patience_increase=1.75,
+             ###threshold=0.995,
+             #min_delta=0.001,
+             patience=5,
+             #profile=False,
+             #nbworkers=6,
+             #save_all=False,
+             verbose=True): \
             # pylint: disable=too-many-arguments,too-many-locals,dangerous-default-value
     """ train a neural network
 
     arguments:
-    training_input -- path to h5 training dataset + file name
+    training_input -- path to ROOT training dataset
     validation_fraction -- held-out fraction of dataset for early-stopping
-    outFile -- prefix for output files
-    network_type -- network type: 1particle, 2particle, 3particle
+    output -- prefix for output files
     structure -- list with number of hidden nodes in hidden layers
     activation -- non-linearity for hidden layers
     output_activation -- non-linearity of output of the network
@@ -73,7 +70,7 @@ def train_nn(training_input,
 
 #============================= Reading trainign data ============================================================
 
-    with h5py.File(training_input, 'r') as hf:  
+    with h5py.File('/data/elham/NN/'+training_input, 'r') as hf:  
         x_train = hf['train_data_x'][:]
         y_train = hf['train_data_y'][:]
         #x_valid = hf['valid_data_x'][:]
@@ -110,22 +107,11 @@ def train_nn(training_input,
 
 #================================== Build the model =============================================================
 
-    if network_type == '1particle':
-        output_layer = [mixture_density(1)(h)]
-        target_values = [y_train[:,0:2]]
-    elif network_type == '2particle':
-        output_layer = [mixture_density(1)(h),mixture_density(1)(h)]
-        target_values = [y_train[:,0:2], y_train[:,2:4]]
-    elif network_type == '3particle':
-        output_layer = [mixture_density(1)(h),mixture_density(1)(h),mixture_density(1)(h)]
-        target_values = [y_train[:,0:2], y_train[:,2:4], y_train[:,4:6]]
-    else:
-        raise Error('network_type should be either 1particle, 2particle or 3particle') 
-    model = keras.models.Model(inputs=inputs, outputs=output_layer)
+    model = keras.models.Model(inputs=inputs, outputs=[mixture_density(1)(h),mixture_density(1)(h)])
 
     #print the summary
     print(model.summary())
-    plot_model(model, to_file= training_output+'/'+outFile+'.png')
+    plot_model(model, to_file='/home/elham/NN_optimise/pixel-MDN-training/Outputs/Try_2p/'+output+'.png')
 
     model.compile(
         optimizer=keras.optimizers.Adam(lr=learning_rate, clipnorm=1),
@@ -136,19 +122,19 @@ def train_nn(training_input,
     loss_record = LossHistory()
     history = model.fit(
         x=x_train,  #tranning_data[0],
-        y=target_values, #[y_train[:,0:2], y_train[:,2:4]],  #tranning_data[1],
+        y=[y_train[:,0:2], y_train[:,2:4]],  #tranning_data[1],
         batch_size=100,
-        epochs=2,
+        epochs=230,
         #validation_data=valid_data,
         validation_split=0.1,
         callbacks=[
-            keras.callbacks.ModelCheckpoint(training_output+'/'+outFile+'.h5', verbose=1, save_best_only=True),
+            keras.callbacks.ModelCheckpoint('/home/elham/NN_optimise/pixel-MDN-training/Outputs/Try_2p/'+output+'.h5', verbose=1, save_best_only=True),
             loss_record
         ],
         verbose=2
     )
-    np.savetxt(training_output+'/training_'+outFile+'.txt', history.history['loss'])
-    np.savetxt(training_output+'/validation_'+outFile+'.txt', history.history['val_loss'])
+    np.savetxt('/home/elham/NN_optimise/pixel-MDN-training/Outputs/Try_2p/training_'+output+'.txt', history.history['loss'])
+    np.savetxt('/home/elham/NN_optimise/pixel-MDN-training/Outputs/Try_2p/validation_'+output+'.txt', history.history['val_loss'])
 
 
 #======================================= prediction history =====================================================
@@ -158,10 +144,10 @@ class prediction_history(keras.callbacks.Callback):
          self.ini_pred=[]
       def on_train_begin(self, logs={}):
          self.ini_pred.append(model.predict(x_train))
-         #print(model.predict(x_train))
+         #print(model.predict(x_train))  
       def on_epoch_begin(self, epoch, logs={}):
           print("EPOCH BEGIN")
-          print(model.predict(x_train))
+          print(model.predict(x_train))   
 
       def on_train_end(self, epoch, logs={}):
          self.predhis.append(model.predict(x_train))
@@ -259,22 +245,12 @@ def mixture_density_loss(nb_components, target_dimension=2):
 def _main():
 
     parse = argparse.ArgumentParser()
-    parse.add_argument('--training_input', required=True,
-        help='Training input h5 file name with full path')
-    parse.add_argument('--training_output', required=True,
-        help='Training output path')
-    parse.add_argument('--outFile', required=True,
-        help='Output file name suffix')
-    parse.add_argument('--network_type', required=True,
-        help='Network type: 1particle, 2particle, 3particle')
-    parse.add_argument('--config', required=True,
-        help='network config option. example: <(python $PWD/genconfig.py --type pos1)')
-    parse.add_argument('--validation-fraction', type=float, default=0.1,
-        help='validation fraction')
-    parse.add_argument('--structure', nargs='+', type=int, default=[100, 80, 50],
-        help= 'network structure: [layer1, layer2, ...]')
-    parse.add_argument('--learning-rate', type=float, default=0.0001,
-        help= 'learning rate')
+    parse.add_argument('--training-input', required=True)
+    parse.add_argument('--output', required=True)
+    parse.add_argument('--config', required=True)
+    parse.add_argument('--validation-fraction', type=float, default=0.1)
+    parse.add_argument('--structure', nargs='+', type=int, default=[100, 80, 50])
+    parse.add_argument('--learning-rate', type=float, default=0.0001)
     #parse.add_argument('--momentum', type=float, default=0.4)
     #parse.add_argument('--batch', type=int, default=1)
     #parse.add_argument('--min-epochs', type=int, default=10)
@@ -288,10 +264,8 @@ def _main():
 
     train_nn(
         args.training_input,
-        args.training_output,
         args.validation_fraction,
-        args.outFile,
-        args.network_type,
+        args.output,
         args.config,
         args.structure,
         args.learning_rate,
