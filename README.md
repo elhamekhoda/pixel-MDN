@@ -6,22 +6,40 @@
 These scripts are relevant for only the training part. There are other scripts (not included here) for producing the training inputs.
 * `train-MDN.py` is the main trainign script. It can be used for all three networks. The inputs should be in h5 format
 * `genconfig.py` creates the network configuration
-* `evalMDN.py` evalues the trained networks on the test set. Srote outputs in a AQL database
-* `gensql_posErr.py` cretes the SQL query to read the data base
-* `residual.cxx` used while reading the SQL data base to ceate histograms
-* `test-driver` executable. Runs SQL query and residual script
+* `evalMDN.py` evalues the trained networks on the test set. It stores the outputs in a SQL data base
+* `gensql_posErr.py` creates the SQL query to read the data base
+* `residual.cxx` used while reading the SQL data base for ceating histograms
+* `test-driver` executable. Runs SQL query and the residual.cxx script
 * `root2json_MDNvars.py` used to convert the MDN variables (from a root file) into json format for `lwtnn`
 
-Example:
-```
-python
+####How to run the code:
+1. Training script:
+
+```python
 python train-MDN.py --training_input PATH-TO-INPUT-FILE(.h5) --training_output OUTPUT-PATH --outFile OUTPUT-SUFFIX --network_type NETWORK-TYPE (1particle, 2particle, 3particle) --config <(python $PWD/genconfig.py --type TYPE (pos1,po2,po3))
 ```
 `--type`: takes values `pos1` for 1 particle network, `pos2` for 2 particle network and `pos3` for 3 particle network
 
-`--network_type`: possible values = 1particle, 2particle, 3particle)
+`--network_type`: possible values = 1particle, 2particle, 3particle
 
 `train-MDN_2p.py` is an example code for 2-particle training
+
+2. Testing script:
+
+```python
+python evalMDN.py --input TEST_INPUT  --output OUTPUT_DATABASE_FILE_PATH --normalization PATH_TO_NORMALIZATION_FILE --config <(python genconfig.py --type pos1/2/3)
+```
+`TEST_INPUT` should be in ROOT format
+`OUTPUT_DATABASE_FILE_PATH` should be .db file name with path
+`PATH_TO_NORMALIZATION_FILE` txt file path where normalizations are stored
+
+3. Reading SQL data base and storing histograms(example for 1-particle network)
+
+```bash
+PATH=$PWD:$PATH bash test-driver pos1 OUTPUT_DATABSE_FILE OUTPUT_ROOT_FILE
+```
+`OUTPUT_ROOT_FILE` File name with .root extension
+
 
 #### software environment
 * Python 3.5.1
