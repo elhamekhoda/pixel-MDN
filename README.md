@@ -27,11 +27,15 @@ python train-MDN.py --training_input PATH-TO-INPUT-FILE(.h5) --training_output O
 2. Testing script:
 
 ```python
-python evalMDN.py --input TEST_INPUT  --output OUTPUT_DATABASE_FILE_PATH --normalization PATH_TO_NORMALIZATION_FILE --config <(python genconfig.py --type pos1/2/3)
+python eval-MDN.py --input TEST_INPUT  --output OUTPUT_DATABASE_FILE_PATH --normalization PATH_TO_NORMALIZATION_FILE --network_type NETWORK-TYPE (1particle, 2particle, 3particle) --model_file TRAINED_MODEL_NAME (h5 file) --config <(python genconfig.py --type pos1/2/3)
 ```
 `TEST_INPUT` should be in ROOT format
+
 `OUTPUT_DATABASE_FILE_PATH` should be .db file name with path
+
 `PATH_TO_NORMALIZATION_FILE` txt file path where normalizations are stored
+
+`TRAINED_MODEL_NAME` training output h5 file
 
 3. Reading SQL data base and storing histograms(example for 1-particle network)
 
