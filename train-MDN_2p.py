@@ -1,4 +1,5 @@
-
+import os
+os.environ['KERAS_BACKEND'] = 'theano'
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,11 +26,11 @@ def train_nn(training_input,
              validation_fraction,
              output,
              config,
-             structure=[100, 80, 50],
+             structure,
              #activation='sigmoid',
              #output_activation='softmax',
-             regularizer=0.0001,
-             learning_rate=0.0001,
+             learning_rate,
+             regularizer,
              #momentum=0.4,
              #batch=60,
              #min_epochs=10,
@@ -70,7 +71,7 @@ def train_nn(training_input,
 
 #============================= Reading trainign data ============================================================
 
-    with h5py.File('/data/elham/NN/'+training_input, 'r') as hf:  
+    with h5py.File('/data/elham/MDN_Study_rel21/'+training_input, 'r') as hf:
         x_train = hf['train_data_x'][:]
         y_train = hf['train_data_y'][:]
         #x_valid = hf['valid_data_x'][:]
@@ -251,6 +252,7 @@ def _main():
     parse.add_argument('--validation-fraction', type=float, default=0.1)
     parse.add_argument('--structure', nargs='+', type=int, default=[100, 80, 50])
     parse.add_argument('--learning-rate', type=float, default=0.0001)
+    parse.add_argument('--regularizer', type=float, default=0.0001)
     #parse.add_argument('--momentum', type=float, default=0.4)
     #parse.add_argument('--batch', type=int, default=1)
     #parse.add_argument('--min-epochs', type=int, default=10)
@@ -269,6 +271,7 @@ def _main():
         args.config,
         args.structure,
         args.learning_rate,
+        args.regularizer,
         #args.momentum,
         #args.batch,
         ##args.min_epochs,

@@ -1,4 +1,5 @@
-
+import os
+os.environ['KERAS_BACKEND'] = 'theano'
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -30,8 +31,8 @@ def train_nn(training_input,
             structure=[100, 80, 50],
             #activation='sigmoid',
             #output_activation='softmax',
-            regularizer=0.0001,
-            learning_rate=0.0001,
+            learning_rate,
+            regularizer,
             #momentum=0.4,
             #batch=60,
             #min_epochs=10,
@@ -275,6 +276,8 @@ def _main():
         help= 'network structure: [layer1, layer2, ...]')
     parse.add_argument('--learning-rate', type=float, default=0.0001,
         help= 'learning rate')
+    parse.add_argument('--regularizer', type=float, default=0.0001,
+        help= 'l2 regularization value')
     #parse.add_argument('--momentum', type=float, default=0.4)
     #parse.add_argument('--batch', type=int, default=1)
     #parse.add_argument('--min-epochs', type=int, default=10)
@@ -295,6 +298,7 @@ def _main():
         args.config,
         args.structure,
         args.learning_rate,
+        args.regularizer,
         #args.momentum,
         #args.batch,
         ##args.min_epochs,
