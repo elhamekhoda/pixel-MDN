@@ -12,7 +12,6 @@ These scripts are relevant for only the training part. There are other scripts (
 * `test-driver` executable. Runs SQL query and the residual.cxx script
 * `root2json_MDNvars.py` used to convert the MDN variables (from a root file) into json format for `lwtnn`
 
-####How to prepare the sample:
 For the MDN, the training sample is produced with 
 [L-G's code](https://gitlab.cern.ch/Atlas-Inner-Tracking/pixel-NN), however,
 before we convert the training sample from root to h5 file, we need to normalize all the input feature(totally 60) in the root file first. 
