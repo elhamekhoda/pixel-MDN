@@ -17,6 +17,7 @@ For the MDN, the training sample is produced with
 before we convert the training sample from root to h5 file, we need to normalize all the input feature(totally 60) in the root file first. 
 Here for the "normalize", the mean is shifted to be zero and the std to be 1. 
 To normalize the sample, first calculate the mean and rms for each input feature:
+
 python makemean.py --input training.root 
 
 python makerms.py --input training.root
