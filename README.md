@@ -53,6 +53,8 @@ python train-MDN.py --training_input PATH-TO-INPUT-FILE(.h5) --training_output O
 
 `train-MDN_2p.py` is an example code for 2-particle training
 
+Make sure you are using the correct hyperparameter. For 1-particle, the structure is [100,50,50], for 2/3-particle, the structure is [100,80,50].
+
 2. Testing script:
 
 ```python
