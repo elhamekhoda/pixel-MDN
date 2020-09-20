@@ -75,8 +75,10 @@ def train_nn(training_input,
 #============================= Reading trainign data ============================================================
 
     with h5py.File(training_input, 'r') as hf:  
-        x_train = hf['train_data_x'][:]
-        y_train = hf['train_data_y'][:]
+        #x_train = hf['train_data_x'][:]
+        #y_train = hf['train_data_y'][:]
+        x_train = hf['input'][:]
+        y_train = hf['target'][:]
         #x_valid = hf['valid_data_x'][:]
         #y_valid = hf['valid_data_y'][:]
 
@@ -139,7 +141,7 @@ def train_nn(training_input,
         x=x_train,  #tranning_data[0],
         y=target_values, #[y_train[:,0:2], y_train[:,2:4]],  #tranning_data[1],
         batch_size=100,
-        epochs=2,
+        epochs=150,
         #validation_data=valid_data,
         validation_split=0.1,
         callbacks=[
