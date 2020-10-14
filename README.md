@@ -12,6 +12,35 @@ These scripts are relevant for only the training part. There are other scripts (
 * `test-driver` executable. Runs SQL query and the residual.cxx script
 * `root2json_MDNvars.py` used to convert the MDN variables (from a root file) into json format for `lwtnn`
 
+For the MDN, the training sample is produced with 
+[L-G's code](https://gitlab.cern.ch/Atlas-Inner-Tracking/pixel-NN), however,
+before we convert the training sample from root to h5 file, we need to normalize all the input feature(totally 60) in the root file first. 
+Here for the "normalize", the mean is shifted to be zero and the std to be 1. 
+To normalize the sample, first calculate the mean and rms for each input feature:
+
+python makemean.py --input training.root 
+
+python makerms.py --input training.root
+
+They will generate a "mean.txt" and "rms.txt".
+
+Then run the normalization script:
+
+root -l training.root
+
+.L normalize.C 
+
+normalize* nor = new normalize(NNinput)
+
+nor->Loop()
+
+This will generate "normalized.root". Use TBrowser to check that for each input feature the mean is 0, the rms is 1.
+
+Next, convert the root file "normalized.root" to h5 file:
+
+toh5.py --input normalized.root --output training.h5 --type pos1(pos2 or pos3)
+
+Now the training.h5 is ready for the MDN training.
 ####How to run the code:
 1. Training script:
 
@@ -23,6 +52,8 @@ python train-MDN.py --training_input PATH-TO-INPUT-FILE(.h5) --training_output O
 `--network_type`: possible values = 1particle, 2particle, 3particle
 
 `train-MDN_2p.py` is an example code for 2-particle training
+
+Make sure you are using the correct hyperparameter. For 1-particle, the structure is [100,50,50], for 2/3-particle, the structure is [100,80,50].
 
 2. Testing script:
 
